@@ -1,0 +1,50 @@
+# Calculation of chiT of a simple diradical from https://doi.org/10.1039/B414284E
+
+model_input:
+  multiplicities: [2, 2] # There are only two paramagnetic centers.
+  mode: single
+  parameters:
+    - name: J
+      type: J
+      value: -50.0 # Let's start from reasonable guess
+      fixed: false
+      pairs: [[0, 1]]
+    - name: g
+      type: g_factor
+      value: 2.002
+      fixed: false
+      centers: [0, 1]
+    - name: theta
+      type: theta
+      value: -10
+      fixed: false
+optimizations:
+  mode: custom
+  custom:
+    tz_sorter:
+    positive_tz_eliminator:
+    symmetrizer:
+      - group_name: S2
+        generators: [[1, 0]]
+    s2_transformer:
+job:
+  mode: fit
+  fit:
+    solver: optim_nm
+    experiment:
+      data: !file 3d-nit2.exp # Data was extracted from Figure 4 of the article.
+      dimension: chiT_in_cm_cubed_kelvin_per_mol
+      ratio: 1.0
+      weights: per_interval
+control:
+  print_level: basic
+
+# The answer of calculation:
+#
+# J: -49.6222
+# g: 1.98008
+# theta: -22.3591
+# RSS = 6.22323e-05
+#
+# Fit of chiT from the article: J = -47,5 K, Theta = -25 K.
+# ESR data: g = 2.0065, J = -43 K

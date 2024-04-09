@@ -8,6 +8,7 @@
 #include "src/entities/data_structures/AbstractDenseVector.h"
 
 namespace quantum::linear_algebra {
+template <typename T>
 class ArmaDenseVector: public AbstractDenseVector {
   public:
     void resize(uint32_t new_size);
@@ -24,13 +25,13 @@ class ArmaDenseVector: public AbstractDenseVector {
     double at(uint32_t i) const override;
     void print(std::ostream& os) const override;
 
-    arma::dvec& modifyDenseVector();
-    const arma::dvec& getDenseVector();
+    arma::Col<T>& modifyDenseVector();
+    const arma::Col<T>& getDenseVector();
 
   private:
     // c-like pointers are necessary to avoid double-free error
     static const ArmaDenseVector* downcast_ptr(const std::unique_ptr<AbstractDenseVector>& ptr);
-    arma::dvec vector_;
+    arma::Col<T> vector_;
 };
 }  // namespace quantum::linear_algebra
 #endif  //SPINNER_ARMADENSEVECTOR_H

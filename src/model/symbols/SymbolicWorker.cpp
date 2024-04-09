@@ -22,13 +22,13 @@ SymbolicWorker& SymbolicWorker::assignSymbolToIsotropicExchange(
         throw std::invalid_argument("This parameter has been already specified");
     }
 
-    if (getSymbolData(symbol_name).type_enum != SymbolTypeEnum::not_specified
-        && getSymbolData(symbol_name).type_enum != SymbolTypeEnum::J) {
+    if (getSymbolProperty(symbol_name).type_enum.has_value()
+        && getSymbolProperty(symbol_name).type_enum != SymbolTypeEnum::J) {
         throw std::invalid_argument(
             symbol_name.get_name() + " has been already specified as not J parameter");
     }
-    if (getSymbolData(symbol_name).type_enum == SymbolTypeEnum::not_specified) {
-        modifySymbolData(symbol_name).type_enum = SymbolTypeEnum::J;
+    if (!getSymbolProperty(symbol_name).type_enum.has_value()) {
+        modifySymbolProperty(symbol_name).type_enum = SymbolTypeEnum::J;
     }
 
     symbolic_isotropic_exchanges_.value()[center_a][center_b] = symbol_name;
@@ -39,13 +39,13 @@ SymbolicWorker& SymbolicWorker::assignSymbolToIsotropicExchange(
 
 SymbolicWorker&
 SymbolicWorker::assignSymbolToGFactor(const SymbolName& symbol_name, size_t center_a) {
-    if (getSymbolData(symbol_name).type_enum != SymbolTypeEnum::not_specified
-        && getSymbolData(symbol_name).type_enum != SymbolTypeEnum::g_factor) {
+    if (getSymbolProperty(symbol_name).type_enum.has_value()
+        && getSymbolProperty(symbol_name).type_enum != SymbolTypeEnum::g_factor) {
         throw std::invalid_argument(
             symbol_name.get_name() + " has been already specified as not g factor parameter");
     }
-    if (getSymbolData(symbol_name).type_enum == SymbolTypeEnum::not_specified) {
-        modifySymbolData(symbol_name).type_enum = SymbolTypeEnum::g_factor;
+    if (!getSymbolProperty(symbol_name).type_enum.has_value()) {
+        modifySymbolProperty(symbol_name).type_enum = SymbolTypeEnum::g_factor;
     }
 
     if (symbolic_g_factors_.empty()) {
@@ -58,13 +58,13 @@ SymbolicWorker::assignSymbolToGFactor(const SymbolName& symbol_name, size_t cent
 }
 
 SymbolicWorker& SymbolicWorker::assignSymbolToTheta(const SymbolName& symbol_name) {
-    if (getSymbolData(symbol_name).type_enum != SymbolTypeEnum::not_specified
-        && getSymbolData(symbol_name).type_enum != SymbolTypeEnum::Theta) {
+    if (getSymbolProperty(symbol_name).type_enum.has_value()
+        && getSymbolProperty(symbol_name).type_enum != SymbolTypeEnum::Theta) {
         throw std::invalid_argument(
             symbol_name.get_name() + " has been already specified as not Theta parameter");
     }
-    if (getSymbolData(symbol_name).type_enum == SymbolTypeEnum::not_specified) {
-        modifySymbolData(symbol_name).type_enum = SymbolTypeEnum::Theta;
+    if (!getSymbolProperty(symbol_name).type_enum.has_value()) {
+        modifySymbolProperty(symbol_name).type_enum = SymbolTypeEnum::Theta;
     }
 
     symbolic_Theta_ = symbol_name;
@@ -74,13 +74,13 @@ SymbolicWorker& SymbolicWorker::assignSymbolToTheta(const SymbolName& symbol_nam
 
 SymbolicWorker&
 SymbolicWorker::assignSymbolToZFSNoAnisotropy(const SymbolName& symbol_name, size_t center_a) {
-    if (getSymbolData(symbol_name).type_enum != SymbolTypeEnum::not_specified
-        && getSymbolData(symbol_name).type_enum != SymbolTypeEnum::D) {
+    if (getSymbolProperty(symbol_name).type_enum.has_value()
+        && getSymbolProperty(symbol_name).type_enum != SymbolTypeEnum::D) {
         throw std::invalid_argument(
             symbol_name.get_name() + " has been already specified as not D parameter");
     }
-    if (getSymbolData(symbol_name).type_enum == SymbolTypeEnum::not_specified) {
-        modifySymbolData(symbol_name).type_enum = SymbolTypeEnum::D;
+    if (!getSymbolProperty(symbol_name).type_enum.has_value()) {
+        modifySymbolProperty(symbol_name).type_enum = SymbolTypeEnum::D;
     }
 
     if (!symbolic_ZFS_.has_value()) {
@@ -96,32 +96,32 @@ SymbolName SymbolicWorker::addSymbol(
     const std::string& name_string,
     double initial_value,
     bool is_changeable,
-    SymbolTypeEnum type_enum) {
+    std::optional<SymbolTypeEnum> type_enum) {
     if (name_string.empty()) {
         throw std::invalid_argument("Name of Symbol should be non-empty");
     }
     SymbolName symbol_name(name_string);
-    if (symbolsMap.find(symbol_name) != symbolsMap.end()) {
+    if (symbolsProperties_.find(symbol_name) != symbolsProperties_.end()) {
         throw std::invalid_argument(symbol_name.get_name() + " name has been already initialized");
     }
-    symbolsMap[symbol_name] = {initial_value, is_changeable, type_enum};
+    symbolsProperties_[symbol_name] = {is_changeable, type_enum};
+    symbolsValues_[symbol_name] = initial_value;
     return symbol_name;
 }
 
-SymbolName SymbolicWorker::addSymbol(
-    const std::string& name_string,
-    double initial_value,
-    bool is_changeable) {
-    return addSymbol(name_string, initial_value, is_changeable, SymbolTypeEnum::not_specified);
-}
-
-SymbolName SymbolicWorker::addSymbol(const std::string& name_string, double initial_value) {
-    return addSymbol(name_string, initial_value, true);
+std::vector<SymbolName> SymbolicWorker::getAllNames(SymbolTypeEnum type_enum) const {
+    std::vector<SymbolName> answer;
+    for (const auto& [symbol_name, symbol_data] : symbolsProperties_) {
+        if (symbol_data.type_enum == type_enum) {
+            answer.push_back(symbol_name);
+        }
+    }
+    return answer;
 }
 
 std::vector<SymbolName> SymbolicWorker::getChangeableNames(SymbolTypeEnum type_enum) const {
     std::vector<SymbolName> answer;
-    for (const auto& [symbol_name, symbol_data] : symbolsMap) {
+    for (const auto& [symbol_name, symbol_data] : symbolsProperties_) {
         if (symbol_data.is_changeable && symbol_data.type_enum == type_enum) {
             answer.push_back(symbol_name);
         }
@@ -143,7 +143,7 @@ bool SymbolicWorker::isAllGFactorsEqual() const {
 
 std::vector<SymbolName> SymbolicWorker::getChangeableNames() const {
     std::vector<SymbolName> answer;
-    for (const auto& [symbol_name, symbol_data] : symbolsMap) {
+    for (const auto& [symbol_name, symbol_data] : symbolsProperties_) {
         if (symbol_data.is_changeable) {
             answer.push_back(symbol_name);
         }
@@ -152,17 +152,20 @@ std::vector<SymbolName> SymbolicWorker::getChangeableNames() const {
 }
 
 double SymbolicWorker::getValueOfName(const SymbolName& symbol_name) const {
-    return getSymbolData(symbol_name).value;
+    if (symbolsValues_.find(symbol_name) == symbolsValues_.end()) {
+        throw std::invalid_argument(symbol_name.get_name() + " name has not been initialized");
+    }
+    return symbolsValues_.at(symbol_name);
 }
 
 void SymbolicWorker::setNewValueToChangeableSymbol(
     const SymbolName& symbol_name,
     double new_value) {
-    if (!getSymbolData(symbol_name).is_changeable) {
+    if (!getSymbolProperty(symbol_name).is_changeable) {
         throw std::invalid_argument("Cannot change value of unchangeable symbol");
     }
 
-    symbolsMap.at(symbol_name).value = new_value;
+    symbolsValues_.at(symbol_name) = new_value;
 }
 
 bool SymbolicWorker::isIsotropicExchangeInitialized() const {
@@ -204,17 +207,17 @@ bool SymbolicWorker::isZFSInitialized() const {
     return symbolic_ZFS_.has_value();
 }
 
-SymbolicWorker::SymbolData SymbolicWorker::getSymbolData(const SymbolName& symbol_name) const {
-    if (symbolsMap.find(symbol_name) == symbolsMap.end()) {
+SymbolicWorker::SymbolProperty SymbolicWorker::getSymbolProperty(const SymbolName& symbol_name) const {
+    if (symbolsProperties_.find(symbol_name) == symbolsProperties_.end()) {
         throw std::invalid_argument(symbol_name.get_name() + " name has not been initialized");
     }
-    return symbolsMap.at(symbol_name);
+    return symbolsProperties_.at(symbol_name);
 }
 
-SymbolicWorker::SymbolData& SymbolicWorker::modifySymbolData(const SymbolName& symbol_name) {
-    if (symbolsMap.find(symbol_name) == symbolsMap.end()) {
+SymbolicWorker::SymbolProperty& SymbolicWorker::modifySymbolProperty(const SymbolName& symbol_name) {
+    if (symbolsProperties_.find(symbol_name) == symbolsProperties_.end()) {
         throw std::invalid_argument(symbol_name.get_name() + " name has not been initialized");
     }
-    return symbolsMap.at(symbol_name);
+    return symbolsProperties_.at(symbol_name);
 }
 }  // namespace model::symbols

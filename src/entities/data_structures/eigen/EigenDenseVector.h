@@ -6,6 +6,7 @@
 #include "src/entities/data_structures/AbstractDenseVector.h"
 
 namespace quantum::linear_algebra {
+template <typename T>
 class EigenDenseVector: public AbstractDenseVector {
   public:
     void resize(uint32_t new_size);
@@ -21,11 +22,11 @@ class EigenDenseVector: public AbstractDenseVector {
     double at(uint32_t i) const override;
     void print(std::ostream& os) const override;
 
-    Eigen::VectorXd& modifyDenseVector();
-    const Eigen::VectorXd& getDenseVector();
+    Eigen::Vector<T, -1>& modifyDenseVector();
+    const Eigen::Vector<T, -1>& getDenseVector();
 
   private:
-    Eigen::VectorXd vector_;
+    Eigen::Vector<T, -1> vector_;
 
     // c-like pointers are necessary to avoid double-free error
     static const EigenDenseVector* downcast_ptr(const std::unique_ptr<AbstractDenseVector>& ptr);

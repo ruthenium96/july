@@ -5,18 +5,12 @@
 
 namespace model::symbols {
 
-// TODO: Does this class make sense, if public constructor is available?
 struct SymbolName {
   public:
     explicit SymbolName(std::string);
     SymbolName() = default;
     const std::string& get_name() const;
-    bool operator<(const SymbolName& rhs) const;
-    bool operator>(const SymbolName& rhs) const;
-    bool operator<=(const SymbolName& rhs) const;
-    bool operator>=(const SymbolName& rhs) const;
-    bool operator==(const SymbolName& rhs) const;
-    bool operator!=(const SymbolName& rhs) const;
+    std::strong_ordering operator<=>(const SymbolName& rhs) const = default;
 
   private:
     std::string name_;

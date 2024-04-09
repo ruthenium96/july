@@ -1,0 +1,64 @@
+# Calculation of chiT of nickel crystal from https://doi.org/10.1039/D0DT03184D
+
+# Magnetic motif:
+#    R3b - R3a - Ni
+#    |           |
+#    Ni  - R3a - R3b
+# Spin(Ni) = 1, Spin(R3a) = Spin(R3b) = 1/2
+
+model_input:
+  multiplicities: [3, 2, 2, 3, 2, 2]
+  mode: single
+  parameters:
+    - name: J_Ni_R3a
+      type: J
+      value: 40.6
+      fixed: false
+      pairs: [[0, 1], [3, 4]]
+    - name: J_Ni_R3b
+      type: J
+      value: -333
+      fixed: false
+      pairs: [[5, 0], [2, 3]]
+    - name: J_DR3
+      type: J
+      value: 4.3
+      fixed: false
+      pairs: [[1, 2], [4, 5]]
+    - name: g_R3s
+      type: g_factor
+      value: 2.002
+      fixed: true
+      centers: [1, 2, 4, 5]
+    - name: g_Ni
+      type: g_factor
+      value: 2.30
+      fixed: false
+      centers: [0, 3]
+optimizations:
+  mode: custom
+  custom:
+    tz_sorter:
+    positive_tz_eliminator:
+    symmetrizer:
+      - group_name: S2
+        generators: [[3, 4, 5, 0, 1, 2]]
+job:
+  mode: fit
+  fit:
+    solver: optim_nm
+    experiment:
+      data: !file nickel.exp
+      dimension: chiT_in_cm_cubed_kelvin_per_mol
+      ratio: 1.0
+      weights: per_interval
+control:
+  print_level: basic
+
+# The answer of calculation:
+#
+# J_DR3: 4.09467 K
+# J_Ni_R3a: 312.819 K
+# J_Ni_R3b: -336.277 K
+# g_Ni: 2.03005
+# RSS = 0.000135798

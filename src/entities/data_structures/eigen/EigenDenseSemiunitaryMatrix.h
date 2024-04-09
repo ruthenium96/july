@@ -6,6 +6,7 @@
 #include "src/entities/data_structures/AbstractDenseSemiunitaryMatrix.h"
 
 namespace quantum::linear_algebra {
+template <typename T>
 class EigenDenseSemiunitaryMatrix: public AbstractDenseSemiunitaryMatrix {
   public:
     uint32_t size_rows() const override;
@@ -20,12 +21,12 @@ class EigenDenseSemiunitaryMatrix: public AbstractDenseSemiunitaryMatrix {
     std::unique_ptr<AbstractDiagonalizableMatrix> unitaryTransform(
         const std::unique_ptr<AbstractDiagonalizableMatrix>& matrix_to_transform) const override;
 
-    const Eigen::MatrixXd& getDenseSemiunitaryMatrix() const;
-    Eigen::MatrixXd& modifyDenseSemiunitaryMatrix();
+    const Eigen::Matrix<T, -1, -1>& getDenseSemiunitaryMatrix() const;
+    Eigen::Matrix<T, -1, -1>& modifyDenseSemiunitaryMatrix();
     void normalize() override;
 
   private:
-    Eigen::MatrixXd denseSemiunitaryMatrix_;
+    Eigen::Matrix<T, -1, -1> denseSemiunitaryMatrix_;
 };
 }  // namespace quantum::linear_algebra
 #endif  //SPINNER_EIGENDENSESEMIUNITARYMATRIX_H

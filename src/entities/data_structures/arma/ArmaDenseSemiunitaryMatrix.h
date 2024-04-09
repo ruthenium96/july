@@ -6,6 +6,7 @@
 #include "src/entities/data_structures/AbstractDenseSemiunitaryMatrix.h"
 
 namespace quantum::linear_algebra {
+template <typename T>
 class ArmaDenseSemiunitaryMatrix: public AbstractDenseSemiunitaryMatrix {
   public:
     uint32_t size_rows() const override;
@@ -19,12 +20,12 @@ class ArmaDenseSemiunitaryMatrix: public AbstractDenseSemiunitaryMatrix {
     std::unique_ptr<AbstractDiagonalizableMatrix> unitaryTransform(
         const std::unique_ptr<AbstractDiagonalizableMatrix>& matrix_to_transform) const override;
     void resize(size_t size_rows, size_t size_cols);
-    const arma::dmat& getDenseSemiunitaryMatrix() const;
-    arma::dmat& modifyDenseSemiunitaryMatrix();
+    const arma::Mat<T>& getDenseSemiunitaryMatrix() const;
+    arma::Mat<T>& modifyDenseSemiunitaryMatrix();
     void normalize() override;
 
   private:
-    arma::dmat denseSemiunitaryMatrix_;
+    arma::Mat<T> denseSemiunitaryMatrix_;
 };
 }  // namespace quantum::linear_algebra
 #endif  //SPINNER_ARMADENSESEMIUNITARYMATRIX_H

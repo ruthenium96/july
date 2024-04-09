@@ -6,6 +6,7 @@
 #include "src/entities/data_structures/AbstractDiagonalizableMatrix.h"
 
 namespace quantum::linear_algebra {
+template <typename T>
 class ArmaDenseDiagonalizableMatrix: public AbstractDiagonalizableMatrix {
   public:
     void add_to_position(double value, uint32_t i, uint32_t j) override;
@@ -16,11 +17,11 @@ class ArmaDenseDiagonalizableMatrix: public AbstractDiagonalizableMatrix {
     double at(uint32_t i, uint32_t j) const override;
     void print(std::ostream& os) const override;
     void resize(uint32_t size);
-    const arma::dmat& getDenseDiagonalizableMatrix() const;
-    arma::dmat& modifyDenseDiagonalizableMatrix();
+    const arma::Mat<T>& getDenseDiagonalizableMatrix() const;
+    arma::Mat<T>& modifyDenseDiagonalizableMatrix();
 
   private:
-    arma::dmat denseDiagonalizableMatrix_;
+    arma::Mat<T> denseDiagonalizableMatrix_;
 };
 }  // namespace quantum::linear_algebra
 #endif  //SPINNER_ARMADENSEDIAGONALIZABLEMATRIX_H

@@ -33,20 +33,15 @@ class Runner {
     // constructor for Runner with no optimizations and default algebra package:
     explicit Runner(model::ModelInput model);
 
-    // TODO: This function is public only for tests. Fix it?
-    void initializeDerivatives();
-
-    // SPECTRUM OPERATIONS
-    void BuildSpectra();
-
     // CHIT OPERATIONS
-    void BuildMuSquaredWorker();
     void initializeExperimentalValues(
         const std::vector<magnetic_susceptibility::ValueAtTemperature>& experimental_data,
         magnetic_susceptibility::ExperimentalValuesEnum experimental_quantity_type,
         double number_of_centers_ratio,
         magnetic_susceptibility::WeightingSchemeEnum weightingSchemeEnum =
             magnetic_susceptibility::per_point);
+    void initializeExperimentalValues(
+        const std::shared_ptr<magnetic_susceptibility::ExperimentalValuesWorker>& experimental_values_worker);
     std::map<model::symbols::SymbolName, double> calculateTotalDerivatives();
     void minimizeResidualError(std::shared_ptr<nonlinear_solver::AbstractNonlinearSolver>);
 
@@ -54,16 +49,16 @@ class Runner {
     std::optional<std::shared_ptr<const model::operators::Operator>>
         getOperator(common::QuantityEnum) const;
     const space::Space& getSpace() const;
-    const Spectrum& getSpectrum(common::QuantityEnum) const;
-    std::optional<std::reference_wrapper<const Matrix>> getMatrix(common::QuantityEnum) const;
+    const Spectrum& getSpectrum(common::QuantityEnum);
+    std::optional<std::reference_wrapper<const Matrix>> getMatrix(common::QuantityEnum);
     std::optional<std::shared_ptr<const model::operators::Operator>>
     getOperatorDerivative(common::QuantityEnum, const model::symbols::SymbolName&) const;
     const Spectrum&
-    getSpectrumDerivative(common::QuantityEnum, const model::symbols::SymbolName&) const;
+    getSpectrumDerivative(common::QuantityEnum, const model::symbols::SymbolName&);
     std::optional<std::reference_wrapper<const Matrix>>
-    getMatrixDerivative(common::QuantityEnum, const model::symbols::SymbolName&) const;
+    getMatrixDerivative(common::QuantityEnum, const model::symbols::SymbolName&);
     const magnetic_susceptibility::MagneticSusceptibilityController&
-    getMagneticSusceptibilityController() const;
+    getMagneticSusceptibilityController();
     const model::symbols::SymbolicWorker& getSymbolicWorker() const;
 
     quantum::linear_algebra::FactoriesList getDataStructuresFactories() const;
@@ -74,8 +69,17 @@ class Runner {
     quantum::linear_algebra::FactoriesList dataStructuresFactories_;
     std::unique_ptr<eigendecompositor::AbstractEigendecompositor> eigendecompositor_;
 
+    // SPECTRUM OPERATIONS
+    void BuildSpectra();
+    // CHIT OPERATIONS
+    void BuildMuSquaredWorker();
+
+    void initializeDerivatives();
+
     const model::Model& getModel() const;
     const common::physical_optimization::OptimizationList& getOptimizationList() const;
+
+    const std::unique_ptr<eigendecompositor::AbstractEigendecompositor>& getEigendecompositor();
 
     double stepOfRegression(
         const std::vector<model::symbols::SymbolName>&,
@@ -83,7 +87,6 @@ class Runner {
         std::vector<double>&,
         bool isGradientRequired);
 
-    // todo: can we use std::variant for these two structures?
     std::optional<magnetic_susceptibility::MagneticSusceptibilityController>
         magnetic_susceptibility_controller_;
     std::optional<std::shared_ptr<magnetic_susceptibility::ExperimentalValuesWorker>>

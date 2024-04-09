@@ -12,11 +12,13 @@
 
 namespace model::symbols {
 
-enum SymbolTypeEnum { not_specified, J, g_factor, Theta, D };
+enum SymbolTypeEnum { J, g_factor, Theta, D };
 
 struct ZFSSymbols {
     SymbolName D;
     std::optional<SymbolName> E;
+    bool operator==(const ZFSSymbols& rhs) const = default;
+    bool operator!=(const ZFSSymbols& rhs) const = default;
 };
 
 class SymbolicWorker {
@@ -45,26 +47,27 @@ class SymbolicWorker {
     SymbolName addSymbol(
         const std::string& name_string,
         double initial_value,
-        bool is_changeable,
-        SymbolTypeEnum type_enum);
-    SymbolName addSymbol(const std::string& name, double initial_value, bool is_changeable);
-    SymbolName addSymbol(const std::string& name, double initial_value);
+        bool is_changeable = true,
+        std::optional<SymbolTypeEnum> type_enum = std::nullopt);
 
     void setNewValueToChangeableSymbol(const SymbolName& symbol_name, double new_value);
 
+    std::vector<SymbolName> getAllNames(SymbolTypeEnum type_enum) const;
     std::vector<SymbolName> getChangeableNames(SymbolTypeEnum type_enum) const;
     std::vector<SymbolName> getChangeableNames() const;
     double getValueOfName(const SymbolName& symbol_name) const;
 
-  private:
-    const size_t number_of_spins_;
+    bool operator==(const SymbolicWorker& rhs) const = default;
+    bool operator!=(const SymbolicWorker& rhs) const = default;
 
-    // TODO: Can we move all of this to SymbolName and rename it to Symbol?
-    //  maybe except of value.
-    struct SymbolData {
-        double value;
+  private:
+    size_t number_of_spins_;
+
+    struct SymbolProperty {
         bool is_changeable;
-        SymbolTypeEnum type_enum;
+        std::optional<SymbolTypeEnum> type_enum;
+        bool operator==(const SymbolProperty& rhs) const = default;
+        bool operator!=(const SymbolProperty& rhs) const = default;
     };
 
     std::optional<std::vector<std::vector<std::optional<SymbolName>>>>
@@ -73,13 +76,14 @@ class SymbolicWorker {
     std::optional<SymbolName> symbolic_Theta_;
     std::optional<std::vector<std::optional<ZFSSymbols>>> symbolic_ZFS_;
 
-    std::map<SymbolName, SymbolData> symbolsMap;
+    std::map<SymbolName, SymbolProperty> symbolsProperties_;
+    std::map<SymbolName, double> symbolsValues_;
 
   public:
-    SymbolData getSymbolData(const SymbolName& symbol_name) const;
+    SymbolProperty getSymbolProperty(const SymbolName& symbol_name) const;
 
   private:
-    SymbolData& modifySymbolData(const SymbolName& symbol_name);
+    SymbolProperty& modifySymbolProperty(const SymbolName& symbol_name);
 };
 
 }  // namespace model::symbols

@@ -50,6 +50,7 @@ class ExperimentalValuesWorker {
     std::vector<ValueAtTemperature> theoretical_mu_squared_;
     ExperimentalValuesEnum experimental_values_type_;
     WeightingScheme weights_;
+    double weighted_sum_of_squares_of_experiment_;
     // Ratio between number of centers (or molar weight) of theoretical and experimental systems.
     double number_of_centers_ratio_;
 };

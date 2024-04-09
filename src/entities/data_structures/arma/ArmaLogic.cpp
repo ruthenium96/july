@@ -6,24 +6,26 @@
 #include "ArmaSparseDiagonalizableMatrix.h"
 
 namespace quantum::linear_algebra {
-std::unique_ptr<AbstractDenseVector> ArmaLogic::diagonalizeValues(
+template <typename T>
+std::unique_ptr<AbstractDenseVector> ArmaLogic<T>::diagonalizeValues(
     const std::unique_ptr<AbstractDiagonalizableMatrix>& diagonalizableMatrix) const {
     return diagonalizeValues(*diagonalizableMatrix);
 }
 
+template <typename T>
 std::unique_ptr<AbstractDenseVector>
-ArmaLogic::diagonalizeValues(const AbstractDiagonalizableMatrix& diagonalizableMatrix) const {
-    auto eigenvalues_ = std::make_unique<ArmaDenseVector>();
+ArmaLogic<T>::diagonalizeValues(const AbstractDiagonalizableMatrix& diagonalizableMatrix) const {
+    auto eigenvalues_ = std::make_unique<ArmaDenseVector<T>>();
 
     if (auto maybeDenseSymmetricMatrix =
-            dynamic_cast<const ArmaDenseDiagonalizableMatrix*>(&diagonalizableMatrix)) {
+            dynamic_cast<const ArmaDenseDiagonalizableMatrix<T>*>(&diagonalizableMatrix)) {
         arma::eig_sym(
             eigenvalues_->modifyDenseVector(),
             maybeDenseSymmetricMatrix->getDenseDiagonalizableMatrix());
     } else if (
         auto maybeSparseSymmetricMatrix =
-            dynamic_cast<const ArmaSparseDiagonalizableMatrix*>(&diagonalizableMatrix)) {
-        auto sparseToDenseCopy = arma::dmat(maybeSparseSymmetricMatrix->getSparseSymmetricMatrix());
+            dynamic_cast<const ArmaSparseDiagonalizableMatrix<T>*>(&diagonalizableMatrix)) {
+        auto sparseToDenseCopy = arma::Mat<T>(maybeSparseSymmetricMatrix->getSparseSymmetricMatrix());
         arma::eig_sym(eigenvalues_->modifyDenseVector(), sparseToDenseCopy);
     } else {
         throw std::bad_cast();
@@ -32,26 +34,28 @@ ArmaLogic::diagonalizeValues(const AbstractDiagonalizableMatrix& diagonalizableM
     return eigenvalues_;
 }
 
-EigenCouple ArmaLogic::diagonalizeValuesVectors(
+template <typename T>
+EigenCouple ArmaLogic<T>::diagonalizeValuesVectors(
     const std::unique_ptr<AbstractDiagonalizableMatrix>& symmetricMatrix) const {
     return diagonalizeValuesVectors(*symmetricMatrix);
 }
 
-EigenCouple ArmaLogic::diagonalizeValuesVectors(
+template <typename T>
+EigenCouple ArmaLogic<T>::diagonalizeValuesVectors(
     const AbstractDiagonalizableMatrix& diagonalizableMatrix) const {
-    auto eigenvalues_ = std::make_unique<ArmaDenseVector>();
-    auto eigenvectors_ = std::make_unique<ArmaDenseSemiunitaryMatrix>();
+    auto eigenvalues_ = std::make_unique<ArmaDenseVector<T>>();
+    auto eigenvectors_ = std::make_unique<ArmaDenseSemiunitaryMatrix<T>>();
 
     if (auto maybeDenseSymmetricMatrix =
-            dynamic_cast<const ArmaDenseDiagonalizableMatrix*>(&diagonalizableMatrix)) {
+            dynamic_cast<const ArmaDenseDiagonalizableMatrix<T>*>(&diagonalizableMatrix)) {
         arma::eig_sym(
             eigenvalues_->modifyDenseVector(),
             eigenvectors_->modifyDenseSemiunitaryMatrix(),
             maybeDenseSymmetricMatrix->getDenseDiagonalizableMatrix());
     } else if (
         auto maybeSparseSymmetricMatrix =
-            dynamic_cast<const ArmaSparseDiagonalizableMatrix*>(&diagonalizableMatrix)) {
-        auto sparseToDenseCopy = arma::dmat(maybeSparseSymmetricMatrix->getSparseSymmetricMatrix());
+            dynamic_cast<const ArmaSparseDiagonalizableMatrix<T>*>(&diagonalizableMatrix)) {
+        auto sparseToDenseCopy = arma::Mat<T>(maybeSparseSymmetricMatrix->getSparseSymmetricMatrix());
         arma::eig_sym(
             eigenvalues_->modifyDenseVector(),
             eigenvectors_->modifyDenseSemiunitaryMatrix(),
@@ -66,26 +70,28 @@ EigenCouple ArmaLogic::diagonalizeValuesVectors(
     return answer;
 }
 
-std::unique_ptr<AbstractDenseVector> ArmaLogic::unitaryTransformAndReturnMainDiagonal(
+template <typename T>
+std::unique_ptr<AbstractDenseVector> ArmaLogic<T>::unitaryTransformAndReturnMainDiagonal(
     const std::unique_ptr<AbstractDiagonalizableMatrix>& symmetricMatrix,
     const std::unique_ptr<AbstractDenseSemiunitaryMatrix>& denseSemiunitaryMatrix) const {
     return unitaryTransformAndReturnMainDiagonal(symmetricMatrix, *denseSemiunitaryMatrix);
 }
 
-std::unique_ptr<AbstractDenseVector> ArmaLogic::unitaryTransformAndReturnMainDiagonal(
+template <typename T>
+std::unique_ptr<AbstractDenseVector> ArmaLogic<T>::unitaryTransformAndReturnMainDiagonal(
     const std::unique_ptr<AbstractDiagonalizableMatrix>& symmetricMatrix,
     const AbstractDenseSemiunitaryMatrix& denseSemiunitaryMatrix) const {
-    auto main_diagonal = std::make_unique<ArmaDenseVector>();
+    auto main_diagonal = std::make_unique<ArmaDenseVector<T>>();
 
     auto maybeDenseSemiunitaryMatrix =
-        dynamic_cast<const ArmaDenseSemiunitaryMatrix*>(&denseSemiunitaryMatrix);
+        dynamic_cast<const ArmaDenseSemiunitaryMatrix<T>*>(&denseSemiunitaryMatrix);
     if (maybeDenseSemiunitaryMatrix == nullptr) {
         throw std::bad_cast();
     }
 
     if (auto maybeSparseSymmetricMatrix =
-            dynamic_cast<const ArmaSparseDiagonalizableMatrix*>(symmetricMatrix.get())) {
-        arma::dmat firstMultiplicationResult =
+            dynamic_cast<const ArmaSparseDiagonalizableMatrix<T>*>(symmetricMatrix.get())) {
+        arma::Mat<T> firstMultiplicationResult =
             maybeDenseSemiunitaryMatrix->getDenseSemiunitaryMatrix().t()
             * maybeSparseSymmetricMatrix->getSparseSymmetricMatrix();
         main_diagonal->modifyDenseVector() = arma::diagvec(
@@ -94,8 +100,8 @@ std::unique_ptr<AbstractDenseVector> ArmaLogic::unitaryTransformAndReturnMainDia
     }
 
     if (auto maybeDenseSymmetricMatrix =
-            dynamic_cast<const ArmaDenseDiagonalizableMatrix*>(symmetricMatrix.get())) {
-        arma::dmat firstMultiplicationResult =
+            dynamic_cast<const ArmaDenseDiagonalizableMatrix<T>*>(symmetricMatrix.get())) {
+        arma::Mat<T> firstMultiplicationResult =
             maybeDenseSemiunitaryMatrix->getDenseSemiunitaryMatrix().t()
             * maybeDenseSymmetricMatrix->getDenseDiagonalizableMatrix();
         main_diagonal->modifyDenseVector() = arma::diagvec(
@@ -106,19 +112,20 @@ std::unique_ptr<AbstractDenseVector> ArmaLogic::unitaryTransformAndReturnMainDia
     throw std::bad_cast();
 }
 
-std::unique_ptr<AbstractDiagonalizableMatrix> ArmaLogic::unitaryTransform(
+template <typename T>
+std::unique_ptr<AbstractDiagonalizableMatrix> ArmaLogic<T>::unitaryTransform(
     const std::unique_ptr<AbstractDiagonalizableMatrix>& symmetricMatrix,
     const AbstractDenseSemiunitaryMatrix& denseSemiunitaryMatrix) const {
-    auto result = std::make_unique<ArmaDenseDiagonalizableMatrix>();
+    auto result = std::make_unique<ArmaDenseDiagonalizableMatrix<T>>();
 
     auto maybeDenseSemiunitaryMatrix =
-        dynamic_cast<const ArmaDenseSemiunitaryMatrix*>(&denseSemiunitaryMatrix);
+        dynamic_cast<const ArmaDenseSemiunitaryMatrix<T>*>(&denseSemiunitaryMatrix);
     if (maybeDenseSemiunitaryMatrix == nullptr) {
         throw std::bad_cast();
     }
 
     if (auto maybeSparseSymmetricMatrix =
-            dynamic_cast<const ArmaSparseDiagonalizableMatrix*>(symmetricMatrix.get())) {
+            dynamic_cast<const ArmaSparseDiagonalizableMatrix<T>*>(symmetricMatrix.get())) {
         result->modifyDenseDiagonalizableMatrix() =
             maybeDenseSemiunitaryMatrix->getDenseSemiunitaryMatrix().t()
             * maybeSparseSymmetricMatrix->getSparseSymmetricMatrix()
@@ -127,7 +134,7 @@ std::unique_ptr<AbstractDiagonalizableMatrix> ArmaLogic::unitaryTransform(
     }
 
     if (auto maybeDenseSymmetricMatrix =
-            dynamic_cast<const ArmaDenseDiagonalizableMatrix*>(symmetricMatrix.get())) {
+            dynamic_cast<const ArmaDenseDiagonalizableMatrix<T>*>(symmetricMatrix.get())) {
         result->modifyDenseDiagonalizableMatrix() =
             maybeDenseSemiunitaryMatrix->getDenseSemiunitaryMatrix().t()
             * maybeDenseSymmetricMatrix->getDenseDiagonalizableMatrix()
@@ -137,4 +144,7 @@ std::unique_ptr<AbstractDiagonalizableMatrix> ArmaLogic::unitaryTransform(
 
     throw std::bad_cast();
 }
+
+template class ArmaLogic<double>;
+template class ArmaLogic<float>;
 }  // namespace quantum::linear_algebra

@@ -4,6 +4,8 @@
 #include <cmath>
 #include <stdexcept>
 
+#include "src/common/PrintingFunctions.h"
+
 namespace magnetic_susceptibility {
 
 ExperimentalValuesWorker::ExperimentalValuesWorker(
@@ -17,6 +19,8 @@ ExperimentalValuesWorker::ExperimentalValuesWorker(
 
     experimental_values_type_ = experimental_values_type;
     number_of_centers_ratio_ = number_of_centers_ratio;
+
+    common::initialExperimentalValuesPrint(experimental_values, experimental_values_type);
 
     if (experimental_values_type == mu_squared_in_bohr_magnetons_squared) {
         // DO NOTHING
@@ -36,7 +40,6 @@ ExperimentalValuesWorker::ExperimentalValuesWorker(
     }
 
     for (ValueAtTemperature& v : experimental_values) {
-        // TODO: number_of_centers_ratio_ or sqrt(number_of_centers_ratio_)?
         v.value *= number_of_centers_ratio_;
     }
 
@@ -47,6 +50,16 @@ ExperimentalValuesWorker::ExperimentalValuesWorker(
     experimental_mu_squared_ = std::move(experimental_values);
 
     weights_ = WeightingScheme(getTemperatures(), weightingSchemeEnum);
+
+    weighted_sum_of_squares_of_experiment_ = 0;
+    for (size_t i = 0; i < experimental_mu_squared_.size(); ++i) {
+        double value = experimental_mu_squared_[i].value;
+        weighted_sum_of_squares_of_experiment_ += weights_.at(i) * value * value;
+    }
+
+    common::experimentalValuesPrint(
+        getExperimentalMuSquared(),
+        getWeights());
 }
 
 double ExperimentalValuesWorker::calculateResidualError() const {
@@ -56,6 +69,7 @@ double ExperimentalValuesWorker::calculateResidualError() const {
         double diff = theoretical_mu_squared_[i].value - experimental_mu_squared_[i].value;
         residual_error += weights_.at(i) * diff * diff;
     }
+    residual_error /= weighted_sum_of_squares_of_experiment_;
     return residual_error;
 }
 
@@ -64,7 +78,8 @@ std::vector<ValueAtTemperature> ExperimentalValuesWorker::calculateDerivative() 
     std::vector<ValueAtTemperature> derivative(experimental_mu_squared_.size());
     for (size_t i = 0; i < theoretical_mu_squared_.size(); ++i) {
         double diff = theoretical_mu_squared_[i].value - experimental_mu_squared_[i].value;
-        derivative[i] = {theoretical_mu_squared_[i].temperature, 2 * diff * weights_.at(i)};
+        derivative[i].temperature = theoretical_mu_squared_[i].temperature;
+        derivative[i].value = 2 * diff * weights_.at(i) / weighted_sum_of_squares_of_experiment_;
     }
     return derivative;
 }
@@ -91,7 +106,6 @@ std::vector<ValueAtTemperature> ExperimentalValuesWorker::getTheoreticalValues()
     std::vector<ValueAtTemperature> theoretical_values = theoretical_mu_squared_;
 
     for (ValueAtTemperature& v : theoretical_values) {
-        // TODO: number_of_centers_ratio_ or sqrt(number_of_centers_ratio_)?
         v.value /= number_of_centers_ratio_;
     }
 

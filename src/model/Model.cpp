@@ -9,7 +9,7 @@
 
 namespace model {
 Model::Model(ModelInput modelInput) :
-    numericalWorker_(modelInput.modifySymbolicWorker(), modelInput.getMults().size()),
+    numericalWorker_(modelInput.getSymbolicWorker(), modelInput.getMults().size()),
     converter_(modelInput.getMults()) {
     operators_map_[common::Energy] = std::make_shared<operators::Operator>();
     InitializeSSquared();
@@ -204,5 +204,11 @@ symbols::NumericalWorker& Model::getNumericalWorker() {
 
 const symbols::NumericalWorker& Model::getNumericalWorker() const {
     return numericalWorker_;
+}
+
+void Model::setNewValueToChangeableSymbol(
+    const symbols::SymbolName& symbol_name,
+    double new_value) {
+    numericalWorker_.setNewValueToChangeableSymbol(symbol_name, new_value);
 }
 }  // namespace model

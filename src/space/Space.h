@@ -27,6 +27,4 @@ class Space {
 };
 }  // namespace space
 
-std::ostream& operator<<(std::ostream& os, const space::Space& space);
-
 #endif  // SPINNER_SPACE_H

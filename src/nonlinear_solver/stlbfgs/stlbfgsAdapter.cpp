@@ -24,6 +24,8 @@ void stlbfgsAdapter::optimize(
     auto adaptedSignatureFunction = adaptSignature(oneStepFunction);
     STLBFGS::Optimizer optimizer {adaptedSignatureFunction};
     optimizer.verbose = false;
+    optimizer.ftol = 1e-16;
+    optimizer.gtol = 1e-18;
     // Run calculation from initial guess. STLBFGS updates changeable_values every iteration.
     optimizer.run(changeable_values);
 }

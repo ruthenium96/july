@@ -11,7 +11,6 @@ GSzSquaredWorker::GSzSquaredWorker(
 double GSzSquaredWorker::calculateTheoreticalMuSquared(double temperature) const {
     double g_sz_squared_averaged =
         3 * ensemble_averager_.ensemble_average(g_sz_squared_, temperature);
-    // TODO: check if it is okay, divide by 3 or something like it
     return g_sz_squared_averaged;
 }
 
@@ -30,7 +29,6 @@ std::vector<ValueAtTemperature> GSzSquaredWorker::calculateDerivative(
         for (size_t i = 0; i < temperatures.size(); ++i) {
             double value =
                 3 * ensemble_averager_.ensemble_average(g_sz_squared_derivative, temperatures[i]);
-            // TODO: should we here divide by 3?
             derivatives[i] = {temperatures[i], value};
         }
     } else {
@@ -43,7 +41,6 @@ std::vector<ValueAtTemperature> GSzSquaredWorker::calculateDerivative(
             double second_term = ensemble_averager_.ensemble_average(
                 g_sz_squared_->element_wise_multiplication(energy_derivative),
                 temperatures[i]);
-            // TODO: should we here divide by 3?
             double value = 3 * (first_term - second_term) / temperatures[i];
             derivatives[i] = {temperatures[i], value};
         }

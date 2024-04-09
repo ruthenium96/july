@@ -9,4 +9,4 @@ add_library(space
         optimization/OptimizedSpaceConstructor.cpp optimization/OptimizedSpaceConstructor.h
         optimization/S2Transformer.cpp optimization/S2Transformer.h)
 
-target_link_libraries(space spin_algebra data_structures)
+target_link_libraries(space spin_algebra data_structures common)

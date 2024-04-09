@@ -1,13 +1,5 @@
 #include "Matrix.h"
 
-std::ostream& operator<<(std::ostream& os, const Matrix& matrix) {
-    for (const Submatrix& submatrix : matrix.blocks) {
-        os << submatrix;
-    }
-    os << "------" << std::endl;
-    return os;
-}
-
 Matrix::Matrix(std::vector<Submatrix>&& m) : blocks(std::move(m)) {}
 
 Matrix::Matrix(
@@ -18,6 +10,6 @@ Matrix::Matrix(
     blocks.reserve(space.getBlocks().size());
 
     for (const auto& subspace : space.getBlocks()) {
-        blocks.emplace_back(Submatrix(subspace, new_operator, converter, factories));
+        blocks.emplace_back(subspace, new_operator, converter, factories);
     }
 }

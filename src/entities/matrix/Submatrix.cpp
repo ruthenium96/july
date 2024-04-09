@@ -2,13 +2,6 @@
 
 #include <set>
 
-std::ostream& operator<<(std::ostream& os, const Submatrix& submatrix) {
-    os << submatrix.properties;
-    submatrix.raw_data->print(os);
-    os << std::endl;
-    return os;
-}
-
 Submatrix::Submatrix(
     std::unique_ptr<quantum::linear_algebra::AbstractDiagonalizableMatrix> raw_data_,
     BlockProperties properties_) :

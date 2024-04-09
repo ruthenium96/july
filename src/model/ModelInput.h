@@ -13,8 +13,24 @@ class ModelInput {
     explicit ModelInput(const std::vector<spin_algebra::Multiplicity>& mults);
 
     const symbols::SymbolicWorker& getSymbolicWorker() const;
-    symbols::SymbolicWorker& modifySymbolicWorker();
     const std::vector<spin_algebra::Multiplicity>& getMults() const;
+
+    ModelInput& assignSymbolToIsotropicExchange(
+        const symbols::SymbolName& symbol_name,
+        size_t center_a,
+        size_t center_b);
+    ModelInput& assignSymbolToGFactor(const symbols::SymbolName& symbol_name, size_t center_a);
+    ModelInput& assignSymbolToZFSNoAnisotropy(const symbols::SymbolName& symbol_name, size_t center_a);
+    ModelInput& assignSymbolToTheta(const symbols::SymbolName& symbol_name);
+
+    symbols::SymbolName addSymbol(
+        const std::string& name_string,
+        double initial_value,
+        bool is_changeable = true,
+        std::optional<symbols::SymbolTypeEnum> type_enum = std::nullopt);
+
+    bool operator==(const ModelInput& rhs) const = default;
+    bool operator!=(const ModelInput& rhs) const = default;
 
   private:
     symbols::SymbolicWorker symbols_;

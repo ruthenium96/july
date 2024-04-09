@@ -3,7 +3,6 @@
 
 #include <cstdint>
 #include <optional>
-#include <ostream>
 #include <string>
 #include <vector>
 
@@ -19,8 +18,5 @@ struct BlockProperties {
 
     bool operator==(const BlockProperties&) const = default;
 };
-
-// TODO: consider moving all the printing code out of the domain classes
-std::ostream& operator<<(std::ostream& os, const BlockProperties& properties);
 
 #endif  //SPINNER_BLOCKPROPERTIES_H

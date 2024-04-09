@@ -4,27 +4,31 @@
 
 namespace quantum::linear_algebra {
 
-void EigenDenseDiagonalizableMatrix::add_to_position(double value, uint32_t i, uint32_t j) {
+template <typename T>
+void EigenDenseDiagonalizableMatrix<T>::add_to_position(double value, uint32_t i, uint32_t j) {
     denseDiagonalizableMatrix_(i, j) += value;
     if (i != j) {
         denseDiagonalizableMatrix_(j, i) += value;
     }
 }
 
-EigenCouple EigenDenseDiagonalizableMatrix::diagonalizeValuesVectors() const {
-    EigenLogic eigenLogic;
+template <typename T>
+EigenCouple EigenDenseDiagonalizableMatrix<T>::diagonalizeValuesVectors() const {
+    EigenLogic<T> eigenLogic;
 
     return eigenLogic.diagonalizeValuesVectors(*this);
 }
 
-std::unique_ptr<AbstractDenseVector> EigenDenseDiagonalizableMatrix::diagonalizeValues() const {
-    EigenLogic eigenLogic;
+template <typename T>
+std::unique_ptr<AbstractDenseVector> EigenDenseDiagonalizableMatrix<T>::diagonalizeValues() const {
+    EigenLogic<T> eigenLogic;
 
     return eigenLogic.diagonalizeValues(*this);
 }
 
+template <typename T>
 std::unique_ptr<AbstractDiagonalizableMatrix>
-EigenDenseDiagonalizableMatrix::multiply_by(double multiplier) const {
+EigenDenseDiagonalizableMatrix<T>::multiply_by(double multiplier) const {
     auto answer = std::make_unique<EigenDenseDiagonalizableMatrix>();
     answer->resize(size());
 
@@ -33,27 +37,37 @@ EigenDenseDiagonalizableMatrix::multiply_by(double multiplier) const {
     return answer;
 }
 
-uint32_t EigenDenseDiagonalizableMatrix::size() const {
+template <typename T>
+uint32_t EigenDenseDiagonalizableMatrix<T>::size() const {
     return denseDiagonalizableMatrix_.cols();
 }
 
-double EigenDenseDiagonalizableMatrix::at(uint32_t i, uint32_t j) const {
+template <typename T>
+double EigenDenseDiagonalizableMatrix<T>::at(uint32_t i, uint32_t j) const {
     return denseDiagonalizableMatrix_(i, j);
 }
 
-void EigenDenseDiagonalizableMatrix::print(std::ostream& os) const {
+template <typename T>
+void EigenDenseDiagonalizableMatrix<T>::print(std::ostream& os) const {
     os << denseDiagonalizableMatrix_ << std::endl;
 }
-void EigenDenseDiagonalizableMatrix::resize(uint32_t size) {
+
+template <typename T>
+void EigenDenseDiagonalizableMatrix<T>::resize(uint32_t size) {
     denseDiagonalizableMatrix_.resize(size, size);
     denseDiagonalizableMatrix_.fill(0);
 }
 
-const Eigen::MatrixXd& EigenDenseDiagonalizableMatrix::getDenseDiagonalizableMatrix() const {
+template <typename T>
+const Eigen::Matrix<T, -1, -1>& EigenDenseDiagonalizableMatrix<T>::getDenseDiagonalizableMatrix() const {
     return denseDiagonalizableMatrix_;
 }
 
-Eigen::MatrixXd& EigenDenseDiagonalizableMatrix::modifyDenseDiagonalizableMatrix() {
+template <typename T>
+Eigen::Matrix<T, -1, -1>& EigenDenseDiagonalizableMatrix<T>::modifyDenseDiagonalizableMatrix() {
     return denseDiagonalizableMatrix_;
 }
+
+template class EigenDenseDiagonalizableMatrix<double>;
+template class EigenDenseDiagonalizableMatrix<float>;
 }  // namespace quantum::linear_algebra

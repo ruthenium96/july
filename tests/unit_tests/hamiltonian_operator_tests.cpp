@@ -8,9 +8,9 @@ TEST(hamiltonian_operator, throw_isotropic_exchange_same_center_22_333_4444_2345
     for (const auto& mults : vector_of_mults) {
         model::ModelInput model(mults);
 
-        auto J = model.modifySymbolicWorker().addSymbol("J", 10);
+        auto J = model.addSymbol("J", 10);
         EXPECT_THROW(
-            model.modifySymbolicWorker().assignSymbolToIsotropicExchange(J, 0, 0),
+            model.assignSymbolToIsotropicExchange(J, 0, 0),
             std::invalid_argument);
     }
 }
@@ -22,8 +22,8 @@ TEST(hamiltonian_operator, exchange_interaction_22_333_4444_23456) {
     for (const auto& mults : vector_of_mults) {
         model::ModelInput modelInput(mults);
 
-        auto J = modelInput.modifySymbolicWorker().addSymbol("J", 10);
-        modelInput.modifySymbolicWorker().assignSymbolToIsotropicExchange(J, 0, 1);
+        auto J = modelInput.addSymbol("J", 10);
+        modelInput.assignSymbolToIsotropicExchange(J, 0, 1);
         // explicitly initialize isotropic exchange:
 
         model::Model model(modelInput);

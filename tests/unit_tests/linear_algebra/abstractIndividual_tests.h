@@ -44,11 +44,12 @@ TYPED_TEST_P(
 
         // check equality:
         for (size_t i = 0; i < size; ++i) {
-            // TODO: epsilon
+            double epsilon =
+                std::abs(denseDiagonalizableMatrixTransformedMainDiagonal->at(i) * 1e-6);
             EXPECT_NEAR(
                 denseDiagonalizableMatrixTransformedMainDiagonal->at(i),
                 denseDiagonalizableMatrixTransformedMatrix->at(i, i),
-                1e-6);
+                epsilon);
         }
     }
 }

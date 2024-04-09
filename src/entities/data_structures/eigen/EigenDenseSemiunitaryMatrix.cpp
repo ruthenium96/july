@@ -5,57 +5,71 @@
 
 namespace quantum::linear_algebra {
 
-uint32_t EigenDenseSemiunitaryMatrix::size_rows() const {
+template <typename T>
+uint32_t EigenDenseSemiunitaryMatrix<T>::size_rows() const {
     return denseSemiunitaryMatrix_.rows();
 }
 
-uint32_t EigenDenseSemiunitaryMatrix::size_cols() const {
+template <typename T>
+uint32_t EigenDenseSemiunitaryMatrix<T>::size_cols() const {
     return denseSemiunitaryMatrix_.cols();
 }
 
-void EigenDenseSemiunitaryMatrix::resize(size_t size_rows, size_t size_cols) {
+template <typename T>
+void EigenDenseSemiunitaryMatrix<T>::resize(size_t size_rows, size_t size_cols) {
     denseSemiunitaryMatrix_.resize(size_rows, size_cols);
     denseSemiunitaryMatrix_.fill(0);
 }
 
-double EigenDenseSemiunitaryMatrix::at(uint32_t i, uint32_t j) const {
+template <typename T>
+double EigenDenseSemiunitaryMatrix<T>::at(uint32_t i, uint32_t j) const {
     return denseSemiunitaryMatrix_(j, i);
 }
 
-void EigenDenseSemiunitaryMatrix::print(std::ostream& os) const {
+template <typename T>
+void EigenDenseSemiunitaryMatrix<T>::print(std::ostream& os) const {
     os << denseSemiunitaryMatrix_ << std::endl;
 }
 
+template <typename T>
 std::unique_ptr<AbstractDenseVector>
-EigenDenseSemiunitaryMatrix::unitaryTransformAndReturnMainDiagonal(
+EigenDenseSemiunitaryMatrix<T>::unitaryTransformAndReturnMainDiagonal(
     const std::unique_ptr<AbstractDiagonalizableMatrix>& matrix_to_transform) const {
-    EigenLogic eigenLogic;
+    EigenLogic<T> eigenLogic;
 
     return eigenLogic.unitaryTransformAndReturnMainDiagonal(matrix_to_transform, *this);
 }
 
-std::unique_ptr<AbstractDiagonalizableMatrix> EigenDenseSemiunitaryMatrix::unitaryTransform(
+template <typename T>
+std::unique_ptr<AbstractDiagonalizableMatrix> EigenDenseSemiunitaryMatrix<T>::unitaryTransform(
     const std::unique_ptr<AbstractDiagonalizableMatrix>& matrix_to_transform) const {
-    EigenLogic eigenLogic;
+    EigenLogic<T> eigenLogic;
 
     return eigenLogic.unitaryTransform(matrix_to_transform, *this);
 }
 
-const Eigen::MatrixXd& EigenDenseSemiunitaryMatrix::getDenseSemiunitaryMatrix() const {
+template <typename T>
+const Eigen::Matrix<T, -1, -1>& EigenDenseSemiunitaryMatrix<T>::getDenseSemiunitaryMatrix() const {
     return denseSemiunitaryMatrix_;
 }
 
-Eigen::MatrixXd& EigenDenseSemiunitaryMatrix::modifyDenseSemiunitaryMatrix() {
+template <typename T>
+Eigen::Matrix<T, -1, -1>& EigenDenseSemiunitaryMatrix<T>::modifyDenseSemiunitaryMatrix() {
     return denseSemiunitaryMatrix_;
 }
 
-void EigenDenseSemiunitaryMatrix::add_to_position(double value, uint32_t i, uint32_t j) {
+template <typename T>
+void EigenDenseSemiunitaryMatrix<T>::add_to_position(double value, uint32_t i, uint32_t j) {
     denseSemiunitaryMatrix_(j, i) += value;
 }
 
-void EigenDenseSemiunitaryMatrix::normalize() {
+template <typename T>
+void EigenDenseSemiunitaryMatrix<T>::normalize() {
     for (int i = 0; i < denseSemiunitaryMatrix_.cols(); i++) {
         denseSemiunitaryMatrix_.col(i).normalize();
     }
 }
+
+template class EigenDenseSemiunitaryMatrix<double>;
+template class EigenDenseSemiunitaryMatrix<float>;
 }  // namespace quantum::linear_algebra

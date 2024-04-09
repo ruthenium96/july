@@ -15,6 +15,7 @@ class AbstractEigendecompositor {
             std::pair<common::QuantityEnum, model::symbols::SymbolName>,
             std::shared_ptr<const model::operators::Operator>>& derivatives_operators,
         const space::Space& space);
+    bool BuildSpectraWasCalled() const;
 
     // What means Spectrum's optional?
     // The getter *may* return std::nullopt if corresponding Operator has been passed into initialize.
@@ -41,6 +42,8 @@ class AbstractEigendecompositor {
     virtual std::optional<std::shared_ptr<quantum::linear_algebra::AbstractDenseSemiunitaryMatrix>>
     BuildSubspectra(size_t number_of_block, const space::Subspace& subspace) = 0;
     virtual void finalize() = 0;
+  private:
+    bool buildSpectraWasCalled = false;
 };
 
 }  // namespace eigendecompositor

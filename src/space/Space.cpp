@@ -26,11 +26,3 @@ const std::vector<Subspace>& Space::getBlocks() const {
 }
 
 }  // namespace space
-
-std::ostream& operator<<(std::ostream& os, const space::Space& space) {
-    for (const space::Subspace& subspace : space.getBlocks()) {
-        os << subspace;
-    }
-    os << "------" << std::endl;
-    return os;
-}

@@ -1,5 +1,6 @@
 #include "OptimizedSpaceConstructor.h"
 
+#include "src/common/Logger.h"
 #include "src/space/optimization/NonAbelianSimplifier.h"
 #include "src/space/optimization/PositiveProjectionsEliminator.h"
 #include "src/space/optimization/S2Transformer.h"
@@ -7,6 +8,16 @@
 #include "src/space/optimization/TzSorter.h"
 #include "src/spin_algebra/GroupAdapter.h"
 #include "src/spin_algebra/OrderOfSummation.h"
+
+namespace {
+std::vector<size_t> sizes_of_blocks(const space::Space& space) {
+    std::vector<size_t> answer(space.getBlocks().size());
+    for (int i = 0; i < space.getBlocks().size(); ++i) {
+        answer[i] = space.getBlocks()[i].decomposition->size_cols();
+    }
+    return answer;
+}
+}
 
 namespace space::optimization {
 
@@ -28,42 +39,41 @@ Space OptimizedSpaceConstructor::construct(
 
     if (optimizationList.isTzSorted()) {
         TzSorter tz_sorter(indexConverter, factories);
+        common::Logger::detailed_msg("Tz-sortation has started.");
         space = tz_sorter.apply(std::move(space));
+        common::Logger::verbose("Sizes of blocks:\n{}", fmt::join(sizes_of_blocks(space), ", "));
+        common::Logger::detailed_msg("Tz-sortation is finished.");
     }
+
+    common::Logger::separate(1, common::PrintLevel::detailed);
+
     if (optimizationList.isPositiveProjectionsEliminated()) {
         uint32_t max_ntz_proj = indexConverter.get_max_ntz_proj();
 
         PositiveProjectionsEliminator positiveProjectionsEliminator(max_ntz_proj);
+        common::Logger::detailed_msg("Positive projections elimination has started.");
         space = positiveProjectionsEliminator.apply(std::move(space));
+        common::Logger::verbose("Sizes of blocks:\n{}", fmt::join(sizes_of_blocks(space), ", "));
+        common::Logger::detailed_msg("Positive projections elimination is finished.");
+        common::Logger::separate(1, common::detailed);
     }
-    for (const auto& group : optimizationList.getGroupsToApply()) {
+
+    for (size_t i = 0; i < optimizationList.getGroupsToApply().size(); ++i) {
         // Symmetrization breaks normalization, because of using integer values of coefficients.
         spaceIsNormalized = false;
 
-        //        if (space_history_.isNonAbelianSimplified && !new_group.properties.is_abelian) {
-        //            throw std::invalid_argument(
-        //                "Symmetrization after using of non-Abelian simplifier causes bugs.");
-        //        }
-
+        const auto& group = optimizationList.getGroupsToApply().at(i);
         Symmetrizer symmetrizer(indexConverter, group, factories);
+        common::Logger::detailed_msg("Symmetrization has started.");
         space = symmetrizer.apply(std::move(space));
-
-        //        if (!new_group.properties.is_abelian) {
-        //            ++space_history_.number_of_non_simplified_abelian_groups;
-        //        }
+        common::Logger::verbose("Sizes of blocks:\n{}", fmt::join(sizes_of_blocks(space), ", "));
+        common::Logger::detailed_msg("Symmetrization is finished.");
+        if (i + 1 == optimizationList.getGroupsToApply().size()) {
+            common::Logger::separate(1, common::detailed);
+        } else {
+            common::Logger::separate(2, common::verbose);
+        }
     }
-    //    if (space_history_.number_of_non_simplified_abelian_groups == 0) {
-    //        return;
-    //    }
-    //    if (space_history_.number_of_non_simplified_abelian_groups != 1) {
-    //        throw std::invalid_argument(
-    //            "Non-Abelian simplification after using of two Non-Abelian Symmetrizers "
-    //            "currently is not allowed.");
-    //    }
-    //    space::optimization::NonAbelianSimplifier nonAbelianSimplifier(factories);
-    //    space_ = nonAbelianSimplifier.apply(std::move(space_));
-    //    space_history_.number_of_non_simplified_abelian_groups = 0;
-    //    space_history_.isNonAbelianSimplified = true;
 
     if (!spaceIsNormalized) {
         for (auto& subspace : space.getBlocks()) {
@@ -81,8 +91,13 @@ Space OptimizedSpaceConstructor::construct(
             factories,
             group_adapter.getOrderOfSummations(),
             group_adapter.getRepresentationMultiplier());
+
+        common::Logger::detailed_msg("S2-transformation has started.");
         space = transformer.apply(std::move(space));
+        common::Logger::detailed_msg("S2-transformation is finished.");
     }
+
+    common::Logger::separate(0, common::detailed);
 
     return space;
 }

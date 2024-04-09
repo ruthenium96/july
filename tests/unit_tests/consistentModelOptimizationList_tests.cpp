@@ -39,10 +39,10 @@ TEST(consistentModelOptimizationList_tests, throw_2222_isotropic_inconsistent_sy
     std::vector<spin_algebra::Multiplicity> mults = {2, 2, 2, 2};
     model::ModelInput model(mults);
     double J_value = 10;
-    auto tripledJ = model.modifySymbolicWorker().addSymbol("3J", 3 * J_value);
-    auto J = model.modifySymbolicWorker().addSymbol("J", J_value);
-    auto doubledJ = model.modifySymbolicWorker().addSymbol("2J", 2 * J_value);
-    model.modifySymbolicWorker()
+    auto tripledJ = model.addSymbol("3J", 3 * J_value);
+    auto J = model.addSymbol("J", J_value);
+    auto doubledJ = model.addSymbol("2J", 2 * J_value);
+    model
         .assignSymbolToIsotropicExchange(tripledJ, 0, 1)
         .assignSymbolToIsotropicExchange(J, 1, 2)
         .assignSymbolToIsotropicExchange(doubledJ, 2, 3)
@@ -62,10 +62,9 @@ TEST(consistentModelOptimizationList_tests, throw_2222_isotropic_accidental_symm
     std::vector<spin_algebra::Multiplicity> mults = {2, 2, 2, 2};
     model::ModelInput model(mults);
     double J = 10;
-    auto firstJ = model.modifySymbolicWorker().addSymbol("J1", J);
-    auto secondJ = model.modifySymbolicWorker().addSymbol("J2", J);
-    model.modifySymbolicWorker()
-        .assignSymbolToIsotropicExchange(firstJ, 0, 1)
+    auto firstJ = model.addSymbol("J1", J);
+    auto secondJ = model.addSymbol("J2", J);
+    model.assignSymbolToIsotropicExchange(firstJ, 0, 1)
         .assignSymbolToIsotropicExchange(firstJ, 1, 2)
         .assignSymbolToIsotropicExchange(firstJ, 2, 3)
         .assignSymbolToIsotropicExchange(secondJ, 3, 0);
@@ -84,11 +83,10 @@ TEST(consistentModelOptimizationList_tests, throw_2222_gfactor_inconsistent_symm
     std::vector<spin_algebra::Multiplicity> mults = {2, 2, 2, 2};
     model::ModelInput model(mults);
     double J_value = 10;
-    auto J = model.modifySymbolicWorker().addSymbol("J", J_value);
-    auto firstg = model.modifySymbolicWorker().addSymbol("g1", 2.0);
-    auto secondg = model.modifySymbolicWorker().addSymbol("g2", 3.0);
-    model.modifySymbolicWorker()
-        .assignSymbolToIsotropicExchange(J, 0, 1)
+    auto J = model.addSymbol("J", J_value);
+    auto firstg = model.addSymbol("g1", 2.0);
+    auto secondg = model.addSymbol("g2", 3.0);
+    model.assignSymbolToIsotropicExchange(J, 0, 1)
         .assignSymbolToIsotropicExchange(J, 1, 2)
         .assignSymbolToIsotropicExchange(J, 2, 3)
         .assignSymbolToIsotropicExchange(J, 3, 0)
@@ -112,11 +110,10 @@ TEST(consistentModelOptimizationList_tests, throw_2222_gfactor_accidental_symmet
     model::ModelInput model(mults);
     double J_value = 10;
     double g_value = 2.0;
-    auto J = model.modifySymbolicWorker().addSymbol("J", J_value);
-    auto firstg = model.modifySymbolicWorker().addSymbol("g1", g_value);
-    auto secondg = model.modifySymbolicWorker().addSymbol("g2", g_value);
-    model.modifySymbolicWorker()
-        .assignSymbolToIsotropicExchange(J, 0, 1)
+    auto J = model.addSymbol("J", J_value);
+    auto firstg = model.addSymbol("g1", g_value);
+    auto secondg = model.addSymbol("g2", g_value);
+    model.assignSymbolToIsotropicExchange(J, 0, 1)
         .assignSymbolToIsotropicExchange(J, 1, 2)
         .assignSymbolToIsotropicExchange(J, 2, 3)
         .assignSymbolToIsotropicExchange(J, 3, 0)
@@ -141,11 +138,10 @@ TEST(consistentModelOptimizationList_tests, throw_SSquaredTransformation_of_ZFS)
     double J_value = 10;
     double g_value = 2.0;
     double D_value = 5.0;
-    auto J = model.modifySymbolicWorker().addSymbol("J", J_value);
-    auto g = model.modifySymbolicWorker().addSymbol("g1", g_value);
-    auto D = model.modifySymbolicWorker().addSymbol("D", D_value);
-    model.modifySymbolicWorker()
-        .assignSymbolToIsotropicExchange(J, 0, 1)
+    auto J = model.addSymbol("J", J_value);
+    auto g = model.addSymbol("g1", g_value);
+    auto D = model.addSymbol("D", D_value);
+    model.assignSymbolToIsotropicExchange(J, 0, 1)
         .assignSymbolToIsotropicExchange(J, 1, 2)
         .assignSymbolToIsotropicExchange(J, 2, 3)
         .assignSymbolToIsotropicExchange(J, 3, 0)
@@ -169,11 +165,10 @@ TEST(consistentModelOptimizationList_tests, throw_SSquaredTransformation_of_diff
     double J_value = 10;
     double g_value = 2.0;
     double D_value = 5.0;
-    auto J = model.modifySymbolicWorker().addSymbol("J", J_value);
-    auto g_one = model.modifySymbolicWorker().addSymbol("g1", g_value);
-    auto g_two = model.modifySymbolicWorker().addSymbol("g2", g_value);
-    model.modifySymbolicWorker()
-        .assignSymbolToIsotropicExchange(J, 0, 1)
+    auto J = model.addSymbol("J", J_value);
+    auto g_one = model.addSymbol("g1", g_value);
+    auto g_two = model.addSymbol("g2", g_value);
+    model.assignSymbolToIsotropicExchange(J, 0, 1)
         .assignSymbolToIsotropicExchange(J, 1, 2)
         .assignSymbolToIsotropicExchange(J, 2, 3)
         .assignSymbolToIsotropicExchange(J, 3, 0)

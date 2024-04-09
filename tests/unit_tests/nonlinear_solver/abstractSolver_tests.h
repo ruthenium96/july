@@ -163,4 +163,5 @@ REGISTER_TYPED_TEST_SUITE_P(
     twoD_absolute,
     threeD_trigonometric);
 
+
 #endif  //SPINNER_UNITABSTRACTSOLVER_TESTS_H

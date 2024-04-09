@@ -184,7 +184,7 @@ NumericalWorker::getGGParameters() const {
 
 std::shared_ptr<const TwoDNumericalParameters<double>>
 NumericalWorker::constructIsotropicExchangeDerivativeParameters(const SymbolName& symbol_name) {
-    if (getSymbolicWorker().getSymbolData(symbol_name).type_enum != SymbolTypeEnum::J) {
+    if (getSymbolicWorker().getSymbolProperty(symbol_name).type_enum != SymbolTypeEnum::J) {
         throw std::invalid_argument(
             symbol_name.get_name() + " has been specified as not J parameter");
     }
@@ -213,7 +213,7 @@ NumericalWorker::constructIsotropicExchangeDerivativeParameters(const SymbolName
 
 std::shared_ptr<const OneDNumericalParameters<double>>
 NumericalWorker::constructZFSDerivativeParameters(const SymbolName& symbol_name) {
-    if (getSymbolicWorker().getSymbolData(symbol_name).type_enum != SymbolTypeEnum::D) {
+    if (getSymbolicWorker().getSymbolProperty(symbol_name).type_enum != SymbolTypeEnum::D) {
         throw std::invalid_argument(
             symbol_name.get_name() + " has been specified as not D parameter");
     }
@@ -239,7 +239,7 @@ std::pair<
     std::shared_ptr<const OneDNumericalParameters<double>>,
     std::shared_ptr<const TwoDNumericalParameters<double>>>
 NumericalWorker::constructGGDerivativeParameters(const SymbolName& symbol_name) {
-    if (getSymbolicWorker().getSymbolData(symbol_name).type_enum != SymbolTypeEnum::g_factor) {
+    if (getSymbolicWorker().getSymbolProperty(symbol_name).type_enum != SymbolTypeEnum::g_factor) {
         throw std::invalid_argument(
             symbol_name.get_name() + " has been specified as not g factor parameter");
     }
@@ -267,7 +267,7 @@ void NumericalWorker::setNewValueToChangeableSymbol(
     double new_value) {
     symbolicWorker_.setNewValueToChangeableSymbol(symbol_name, new_value);
 
-    auto symbol_data = getSymbolicWorker().getSymbolData(symbol_name);
+    auto symbol_data = getSymbolicWorker().getSymbolProperty(symbol_name);
 
     if (symbol_data.type_enum == symbols::SymbolTypeEnum::J) {
         updateIsotropicExchangeParameters();

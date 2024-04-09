@@ -9,6 +9,7 @@
 #include "src/entities/data_structures/AbstractSymmetricMatrix.h"
 
 namespace quantum::linear_algebra {
+template <typename T>
 class ArmaLogic {
   public:
     std::unique_ptr<AbstractDenseVector>

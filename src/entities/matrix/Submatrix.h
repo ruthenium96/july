@@ -22,7 +22,6 @@ struct Submatrix {
         const model::operators::Operator& new_operator,
         const lexicographic::IndexConverter& converter,
         const quantum::linear_algebra::FactoriesList& factories);
-    friend std::ostream& operator<<(std::ostream& os, const Submatrix& submatrix);
 };
 
 #endif  //SPINNER_SUBMATRIX_H

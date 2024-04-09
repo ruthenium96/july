@@ -25,15 +25,12 @@ TEST(simple_analytical_dependencies, nothing) {
         {
             model::ModelInput model(mults);
             double g_value = g_exact;
-            auto g = model.modifySymbolicWorker().addSymbol("g", g_value);
+            auto g = model.addSymbol("g", g_value);
             for (size_t i = 0; i < mults.size(); ++i) {
-                model.modifySymbolicWorker().assignSymbolToGFactor(g, i);
+                model.assignSymbolToGFactor(g, i);
             }
 
             runner::Runner runner(model);
-
-            runner.BuildSpectra();
-            runner.BuildMuSquaredWorker();
 
             double sum_of_s_squared_ = sum_of_s_squared(runner.getIndexConverter());
 
@@ -68,18 +65,15 @@ TEST(simple_analytical_dependencies, Theta) {
 
             {
                 model::ModelInput model(mults);
-                auto Theta = model.modifySymbolicWorker().addSymbol("Theta", Theta_exact);
-                model.modifySymbolicWorker().assignSymbolToTheta(Theta);
+                auto Theta = model.addSymbol("Theta", Theta_exact);
+                model.assignSymbolToTheta(Theta);
                 double g_value = g_exact;
-                auto g = model.modifySymbolicWorker().addSymbol("g", g_value);
+                auto g = model.addSymbol("g", g_value);
                 for (size_t i = 0; i < mults.size(); ++i) {
-                    model.modifySymbolicWorker().assignSymbolToGFactor(g, i);
+                    model.assignSymbolToGFactor(g, i);
                 }
 
                 runner::Runner runner(model);
-
-                runner.BuildSpectra();
-                runner.BuildMuSquaredWorker();
 
                 double sum_of_s_squared_ = sum_of_s_squared(runner.getIndexConverter());
 

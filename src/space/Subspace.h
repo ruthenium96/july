@@ -1,8 +1,6 @@
 #ifndef SPINNER_SUBSPACE_H
 #define SPINNER_SUBSPACE_H
 
-#include <ostream>
-
 #include "src/entities/BlockProperties.h"
 #include "src/entities/data_structures/AbstractDenseSemiunitaryMatrix.h"
 #include "src/entities/data_structures/AbstractSparseSemiunitaryMatrix.h"
@@ -18,7 +16,6 @@ struct Subspace {
         std::unique_ptr<quantum::linear_algebra::AbstractSparseSemiunitaryMatrix>&&,
         std::optional<std::unique_ptr<quantum::linear_algebra::AbstractDenseSemiunitaryMatrix>>&& =
             std::nullopt);
-    friend std::ostream& operator<<(std::ostream& os, const Subspace& subspace);
 };
 }  // namespace space
 

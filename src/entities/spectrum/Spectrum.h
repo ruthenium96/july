@@ -13,6 +13,5 @@ struct Spectrum {
     explicit Spectrum(std::vector<Subspectrum>&& m);
 };
 
-std::ostream& operator<<(std::ostream& os, const Spectrum& space);
 
 #endif  //SPINNER_SPECTRUM_H

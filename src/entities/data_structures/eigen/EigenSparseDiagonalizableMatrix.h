@@ -5,6 +5,7 @@
 #include "src/entities/data_structures/AbstractDiagonalizableMatrix.h"
 
 namespace quantum::linear_algebra {
+template <typename T>
 class EigenSparseDiagonalizableMatrix: public AbstractDiagonalizableMatrix {
   public:
     void add_to_position(double value, uint32_t i, uint32_t j) override;
@@ -17,11 +18,11 @@ class EigenSparseDiagonalizableMatrix: public AbstractDiagonalizableMatrix {
     ~EigenSparseDiagonalizableMatrix() override = default;
     void resize(size_t size);
 
-    const Eigen::SparseMatrix<double>& getSparseDiagonalizableMatrix() const;
-    Eigen::SparseMatrix<double>& modifySparseDiagonalizableMatrix();
+    const Eigen::SparseMatrix<T>& getSparseDiagonalizableMatrix() const;
+    Eigen::SparseMatrix<T>& modifySparseDiagonalizableMatrix();
 
   private:
-    Eigen::SparseMatrix<double> sparseDiagonalizableMatrix_;
+    Eigen::SparseMatrix<T> sparseDiagonalizableMatrix_;
 };
 }  // namespace quantum::linear_algebra
 #endif  //SPINNER_EIGENSPARSEDIAGONALIZABLEMATRIX_H

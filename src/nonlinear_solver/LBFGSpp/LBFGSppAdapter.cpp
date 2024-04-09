@@ -41,8 +41,10 @@ void LBFGSppAdapter::optimize(
     auto changeable_values_eigen = convertFromSTLToEigen(changeable_values);
 
     LBFGSpp::LBFGSParam<double> param;
-    param.epsilon = 1e-5;
-    param.max_iterations = 100;
+    param.epsilon = 1e-14;
+    param.epsilon_rel = 1e-14;
+    param.max_iterations = 1000;
+
     LBFGSpp::LBFGSSolver<double> solver(param);
     double fx;
     solver.minimize(adaptedSignatureFunction, changeable_values_eigen, fx);

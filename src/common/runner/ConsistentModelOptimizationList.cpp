@@ -58,15 +58,17 @@ ConsistentModelOptimizationList::ConsistentModelOptimizationList(
 }
 
 void ConsistentModelOptimizationList::InitializeDerivatives() {
-    for (const auto& [pair, shared_ptr] : model_.getOperatorDerivatives()) {
-        derivatives_for_explicit_construction_[pair] = shared_ptr;
+    if (derivatives_for_explicit_construction_.empty()) {
+        for (const auto& [pair, shared_ptr] : model_.getOperatorDerivatives()) {
+            derivatives_for_explicit_construction_[pair] = shared_ptr;
+        }
     }
 }
 
 void ConsistentModelOptimizationList::setNewValueToChangeableSymbol(
     const model::symbols::SymbolName& symbol_name,
     double new_value) {
-    model_.getNumericalWorker().setNewValueToChangeableSymbol(symbol_name, new_value);
+    model_.setNewValueToChangeableSymbol(symbol_name, new_value);
 }
 
 const std::map<common::QuantityEnum, std::shared_ptr<const model::operators::Operator>>&
